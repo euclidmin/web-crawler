@@ -6,7 +6,7 @@ from selenium import webdriver
 # driver.get('https://nid.naver.com/nidlogin.login')
 #
 # driver.find_element_by_name('id').send_keys('euler73')
-# driver.find_element_by_name('pw').send_keys('rhdydals73.')
+# driver.find_element_by_name('pw').send_keys('***********')
 # driver.find_element_by_xpath('//*[@id="frmNIDLogin"]/fieldset/input').click()
 
 
@@ -17,13 +17,19 @@ from bs4 import BeautifulSoup
 URL = "http://www.innak.kr/php/board.php?board=main&command=skin_insert&exe=insert_iboard1_home"
 URL1 = "http://www.innak.kr/php/board.php?board=z03gofishing&command=skin_insert&exe=insert_iboard3.php"
 URL2 = "http://www.innak.kr/php/board.php?board=bhotangler2019&command=body&no=2248"
-req = requests.get(URL1)
+req = requests.get(URL2)
 soup = BeautifulSoup(req.content, 'html5lib')
 # soup = BeautifulSoup(req.content, 'html.parser')
 
 innak = []  # a list to store
 
-table = soup.find_all('div', attrs={'id': 'mainTextBodyDiv'})
+maintext = soup.find_all('div', attrs={'id': 'mainTextBodyDiv'})
+tables = maintext[0].find_all('table')
+
+for table in tables:
+    print(table.get_test())
+
+
 #
 # for row in table.findAll('div', attrs={'class': 'quote'}):
 #     quote = {}
