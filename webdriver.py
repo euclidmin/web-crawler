@@ -23,13 +23,41 @@ soup = BeautifulSoup(req.content, 'html5lib')
 
 innak = []  # a list to store
 
-maintext = soup.find_all('div', attrs={'id': 'mainTextBodyDiv'})
-tables = maintext[0].find_all('table')
+# maintext = soup.find_all('div', attrs={'id': 'mainTextBodyDiv'})
+# len(soup.contents) is 1
+# tables = maintext[0].find_all('table')
+
+maintext = soup.find('div', attrs={'id': 'mainTextBodyDiv'})
+# len(soup.contents) is 57
+# tables = maintext.find_all('table')
+angler_info_table_lefts = maintext.find_all('td',attrs={'class':'b_detail_left'})
+angler_info_table_rights = maintext.find_all('td',attrs={'class':'b_detail_right'})
+
+data2248 = {}
+for angler_info_left, angler_info_right in zip(angler_info_table_lefts, angler_info_table_rights):
+    left_text = angler_info_left.get_text().strip()
+    right_text = angler_info_right.get_text().strip()
+    # data2248 = {td_l:td_r}
+    data2248[left_text] = right_text
+
+maintext.find('td', attrs={'id':'bodytextID2248'})
+
+
+for td_right in td_rights:
+    td_right.get_text().strip()
+
+
+
+
+td_rights[0].get_text().strip()
+
 
 for table in tables:
-    print(table.get_test())
+    print(table.get_text())
 
-
+for link in soup.find_all('a'):
+    if link.a is not None:
+        print(link.a['href'])
 #
 # for row in table.findAll('div', attrs={'class': 'quote'}):
 #     quote = {}
