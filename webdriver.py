@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 
 URL = "http://www.innak.kr/php/board.php?board=main&command=skin_insert&exe=insert_iboard1_home"
 URL1 = "http://www.innak.kr/php/board.php?board=z03gofishing&command=skin_insert&exe=insert_iboard3.php"
-URL2 = "http://www.innak.kr/php/board.php?board=bhotangler2019&command=body&no=2248"
+URL2 = "http://www.innak.kr/php/board.php?board=bhotangler2019&command=body&no=2247"
 req = requests.get(URL2)
 soup = BeautifulSoup(req.content, 'html5lib')
 # soup = BeautifulSoup(req.content, 'html.parser')
@@ -40,7 +40,32 @@ for angler_info_left, angler_info_right in zip(angler_info_table_lefts, angler_i
     # data2248 = {td_l:td_r}
     data2248[left_text] = right_text
 
-maintext.find('td', attrs={'id':'bodytextID2248'})
+body_text_raw = maintext.find('td', attrs={'id':'bodytextID2247'})
+body_text_striped = body_text_raw.get_text().strip().replace('\xa0', '').splitlines()
+
+body_text = []
+for line in body_text_striped :
+    print(line)
+    # if line.isspace():
+    if line.isprintable():
+        body_text.append(line)
+    else :
+        pass
+
+
+data2248['body_text'] = body_text
+
+
+
+
+
+import re
+def remove_control_chart(s):
+    return re.sub(r'\\x..', '', s)
+
+
+
+'',
 
 
 for td_right in td_rights:
