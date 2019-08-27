@@ -11,6 +11,11 @@ from selenium import webdriver
 
 
 
+import re
+def remove_control_chart(s):
+    return re.sub('[\t\xa0]', '', s)
+
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -41,48 +46,42 @@ for angler_info_left, angler_info_right in zip(angler_info_table_lefts, angler_i
     data2248[left_text] = right_text
 
 body_text_raw = maintext.find('td', attrs={'id':'bodytextID2247'})
-body_text_striped = body_text_raw.get_text().strip().replace('\xa0', '').splitlines()
-
-body_text = []
-for line in body_text_striped :
-    print(line)
-    # if line.isspace():
-    if line.isprintable():
-        body_text.append(line)
-    else :
-        pass
+# body_text_striped = body_text_raw.get_text().strip().replace('\xa0', '').splitlines()
+body_text_striped = body_text_raw.get_text().strip()
+body_text = remove_control_chart(body_text_striped)
+# for line in body_text_striped :
+#     print(line)
+#     #if  not line.isspace():
+#     if line.isprintable():
+#         body_text.append(line)
+#     else :
+#         pass
 
 
 data2248['body_text'] = body_text
 
+print(data2248)
 
 
 
 
-import re
-def remove_control_chart(s):
-    return re.sub(r'\\x..', '', s)
 
 
-
-'',
-
-
-for td_right in td_rights:
-    td_right.get_text().strip()
-
-
-
-
-td_rights[0].get_text().strip()
-
-
-for table in tables:
-    print(table.get_text())
-
-for link in soup.find_all('a'):
-    if link.a is not None:
-        print(link.a['href'])
+# for td_right in td_rights:
+#     td_right.get_text().strip()
+#
+#
+#
+#
+# td_rights[0].get_text().strip()
+#
+#
+# for table in tables:
+#     print(table.get_text())
+#
+# for link in soup.find_all('a'):
+#     if link.a is not None:
+#         print(link.a['href'])
 #
 # for row in table.findAll('div', attrs={'class': 'quote'}):
 #     quote = {}
