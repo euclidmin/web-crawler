@@ -1,3 +1,5 @@
+import urllib.parse
+
 from bs4 import BeautifulSoup
 import requests
 
@@ -76,13 +78,60 @@ class FishingCrawler:
         return self.fishing_record
 
 
+class UrlEncoder:
+    # import urllib.parse
+    def __init__(self, site_url='http://www.innak.kr/php/board.php',
+                 params={'board':'bhotangler2019','command':'body','no':'2247'},
+                 board=None, command=None, no=None):
+        self.site_url=site_url
+        self.params=params
+        self.board=board
+        self.command=command
+        self.no=no
+        self.url = None
+
+
+    def combine(self, params=None):
+
+        if self.params is None:
+            self.params = {
+                'board':'bhotangler2019',
+                'command':'body',
+                'no':'2247'
+            }
+        else:
+            params = self.params
+
+        encoded_params = urllib.parse.urlencode(params)
+        self.url = self.site_url + '?' + encoded_params
+        return self.url
+
+
+
+    def get_url(self):
+        if self.url is None:
+            print("check : url is None")
+
+        return self.url
+
+
+    def get_next(self):
+        num_str = self.params['no']
+        num_int = int(num_str) + 1
+        num_str = str(num_int)
+        self.params['no'] = num_str
+        self.combine()
+        return self.url
+
+
+
 
 def main():
 
-    URL = "http://www.innak.kr/php/board.php?board=bhotangler2019&command=body&no=2247"
+    ue = UrlEncoder(site_url='http://www.innak.kr/php/board.php')
+    url = ue.combine()
 
-    URL_body =
-    fc = FishingCrawler(url=URL)
+    fc = FishingCrawler(url=url)
     record = fc.crawl()
     print(record)
 
