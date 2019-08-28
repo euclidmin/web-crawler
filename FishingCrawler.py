@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import requests
 
 class FishingCrawler:
 
@@ -11,10 +12,7 @@ class FishingCrawler:
 
 
     def get_html(self, url=None):
-        import requests
-
         # u = url ? url : self.url
-
         if url is not None :
             u = url
         elif self.url is not None:
@@ -79,13 +77,20 @@ class FishingCrawler:
 
 
 
+def main():
 
-
-if '__name__' == '__main__' :
     URL = "http://www.innak.kr/php/board.php?board=bhotangler2019&command=body&no=2247"
+
+    URL_body =
     fc = FishingCrawler(url=URL)
     record = fc.crawl()
     print(record)
+
+
+if __name__ == '__main__' :
+    main()
+
+
 
 
 
