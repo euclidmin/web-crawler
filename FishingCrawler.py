@@ -1,30 +1,26 @@
 import urllib.parse
-
+import re
 from bs4 import BeautifulSoup
 import requests
 
 class FishingCrawler:
 
-    def __init__(self, soup=None, url=None, maintext=None):
+    def __init__(self, ue=None):
         # 초기화 필요한 컨테이너 변수들 선언
-        self.soup = soup
-        self.url = url
+        self.soup = None
         self.fishing_record = dict()
-        self.maintext = maintext
+        self.ue = ue
 
 
     def get_html(self, url=None):
-        # u = url ? url : self.url
         if url is not None :
-            u = url
-        elif self.url is not None:
-            u = self.url
+            self.url = url
         else:
             print("check : url is None")
             print("check : req is None")
             return
 
-        req = requests.get(u)
+        req = requests.get(self.url)
         self.soup = BeautifulSoup(req.content, 'html5lib')
         # return self.soup
 
@@ -52,60 +48,70 @@ class FishingCrawler:
         self.maintext = maintext
 
 
-    def extract_body_text(self):
-        import re
+    def extract_body_text(self, bodytextID='bodytextID2247'):
+        # import re
         def _remove_control_chart(s):
             return re.sub('[\t\xa0]', '', s)
 
-        if self.maintext is not None:
-            maintext = self.maintext
-        else:
+        if self.maintext is None:
             print("check : maintext is None")
             return
 
-        body_text_raw = maintext.find('td', attrs={'id': 'bodytextID2247'})
-        # body_text_striped = body_text_raw.get_text().strip().replace('\xa0', '').splitlines()
-        body_text_striped = body_text_raw.get_text().strip()
-        body_text = _remove_control_chart(body_text_striped)
-        self.fishing_record['body_text'] = body_text
+        body_text_raw = self.maintext.find('td', attrs={'id': bodytextID})
+
+        if body_text_raw is None:
+            self.fishing_record['body_text'] = 'This document does not exist.'
+            return
+        else:
+            body_text_striped = body_text_raw.get_text().strip()
+            body_text = _remove_control_chart(body_text_striped)
+            self.fishing_record['body_text'] = body_text
 
 
     def crawl(self):
-        self.get_html()
-        # self.extract_angler_info(self.soup, record)
-        self.extract_angler_info()
-        self.extract_body_text()
-        return self.fishing_record
+        ue = self.ue
+        for url in ue:
+            self.get_html(url)
+            self.extract_angler_info()
+            bodytextID = ue.get_bodytextID()
+            self.extract_body_text(bodytextID)
+            print(self.fishing_record)
 
 
 class UrlEncoder:
     # import urllib.parse
     def __init__(self, site_url='http://www.innak.kr/php/board.php',
                  params={'board':'bhotangler2019','command':'body','no':'2247'},
-                 board=None, command=None, no=None):
+                 no_list=None):
         self.site_url=site_url
         self.params=params
-        self.board=board
-        self.command=command
-        self.no=no
         self.url = None
+        self.no_list = no_list
+        self.size = None
+        self.index = None
 
 
-    def combine(self, params=None):
+    def __iter__(self):
+        self.index = 0
+        self.size = len(self.no_list)
+        return self
 
-        if self.params is None:
-            self.params = {
-                'board':'bhotangler2019',
-                'command':'body',
-                'no':'2247'
-            }
-        else:
-            params = self.params
+    def __next__(self):
+        if self.index >= self.size:
+            raise StopIteration
 
-        encoded_params = urllib.parse.urlencode(params)
-        self.url = self.site_url + '?' + encoded_params
+        num = self.no_list[self.index]
+        self.params['no'] = str(num)
+        self.url = self.combine()
+
+        self.index += 1
         return self.url
 
+
+    def combine(self):
+        encoded_params = urllib.parse.urlencode(self.params)
+        self.url = self.site_url + '?' + encoded_params
+        return self.url
 
 
     def get_url(self):
@@ -115,7 +121,7 @@ class UrlEncoder:
         return self.url
 
 
-    def get_next(self):
+    def get_next_url(self):
         num_str = self.params['no']
         num_int = int(num_str) + 1
         num_str = str(num_int)
@@ -123,17 +129,30 @@ class UrlEncoder:
         self.combine()
         return self.url
 
-
+    def get_bodytextID(self):
+        if self.params is None:
+            print('check : params')
+        else:
+            num_str = self.params['no']
+            bodytextID = 'bodytextID' + num_str
+        return bodytextID
 
 
 def main():
+    params = {
+        'board': 'bhotangler2019',
+        'command': 'body',
+        'no': '2247'
+    }
+    # no_list = [2247, 2248, 2249, 2250]
+    no_list = range(2247, 2257)
+    # no_list = range(1139, 1239)
+    # no_list = [1145]
+    ue = UrlEncoder(site_url='http://www.innak.kr/php/board.php', params=params, no_list=no_list)
+    ue.combine()
 
-    ue = UrlEncoder(site_url='http://www.innak.kr/php/board.php')
-    url = ue.combine()
-
-    fc = FishingCrawler(url=url)
-    record = fc.crawl()
-    print(record)
+    fc = FishingCrawler(ue=ue)
+    fc.crawl()
 
 
 if __name__ == '__main__' :
