@@ -11,7 +11,8 @@ class OceanMensuration:
     def get_mensuration_info(self):
         url = 'http://apis.data.go.kr/1520635/OceanMensurationService/getOceanMesurationDetailcoo'
         data = {
-            'ServiceKey': 'B5vTA%2BwSQ0%2FS3w%2BrbawrLgVxGIdztJG1keqskxowzSHEDpWdpFdMHs69UgO4ei3R9aNDcqmjgANp49s%2FVhXiqw%3D%3D'
+            'ServiceKey': 'B5vTA%2BwSQ0%2FS3w%2BrbawrLgVxGIdztJG1keqskxowzSHEDpWdpFdMHs69UgO4ei3R9aNDcqmjgANp49s%2FVhXiqw%3D%3D',
+            'numOfRow': '100'
         }
         encoded_args = urlencode(data, safe='%')
         req_url = url + '?' + encoded_args
@@ -39,10 +40,7 @@ def main():
         mensuration_point['경도'] = item.find('lon').text
         mensuration_point['관측시작일'] = item.find('bldDate').text
         endDate = item.find('endDat')
-        if endDate :
-            mensuration_point['관측종료일'] = endDate.text
-        else:
-            mensuration_point['관측종료일'] = ''
+        mensuration_point['관측종료일'] = endDate.text if endDate else ''
 
         # print(transaction)
         print(mensuration_point)
